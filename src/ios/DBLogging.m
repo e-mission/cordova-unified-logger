@@ -96,8 +96,8 @@ static DBLogging *_database;
         // The SQLITE_TRANSIENT is used to indicate that the raw data (userMode, tripId, sectionId
         // is not permanent data and the SQLite library should make a copy
         sqlite3_bind_int64(compiledStatement, 1, [NSDate date].timeIntervalSince1970);
-        sqlite3_bind_text(compiledStatement, 3, [level UTF8String], -1, SQLITE_TRANSIENT);
-        sqlite3_bind_text(compiledStatement, 2, [message UTF8String], -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(compiledStatement, 2, [level UTF8String], -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(compiledStatement, 3, [message UTF8String], -1, SQLITE_TRANSIENT);
         NSInteger execCode = sqlite3_step(compiledStatement);
         if (execCode != SQLITE_DONE) {
             @throw [NSException exceptionWithName:@"SQLError"
