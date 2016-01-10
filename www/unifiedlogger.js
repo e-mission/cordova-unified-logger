@@ -9,16 +9,16 @@ var ULogger = {
      * another plugin (assuming such a thing is possible, and provide a good
      * exemplar for the usercache plugin.
      */
-    var LOG_TABLE = "logTable";
-    var KEY_ID = "ID";
-    var KEY_TS = "ts";
-    var KEY_LEVEL = "level";
-    var KEY_MESSAGE = "message";
+    LOG_TABLE: "logTable",
+    KEY_ID: "ID",
+    KEY_TS: "ts",
+    KEY_LEVEL: "level",
+    KEY_MESSAGE: "message",
 
-    var LEVEL_DEBUG = "DEBUG";
-    var LEVEL_INFO = "INFO";
-    var LEVEL_WARN = "WARN";
-    var LEVEL_ERROR = "ERROR";
+    LEVEL_DEBUG: "DEBUG",
+    LEVEL_INFO: "INFO",
+    LEVEL_WARN: "WARN",
+    LEVEL_ERROR: "ERROR",
 
     /*
      * Arguments:
@@ -29,11 +29,11 @@ var ULogger = {
 
     log: function (level, message, errorCallback) {
         exec(null, errorCallback, "UnifiedLogger", "log", [level, message]);
-    }
+    },
 
     clearAll: function(successCallback, errorCallback) {
         exec(null, errorCallback, "UnifiedLogger", "clear", []);
-    }
+    },
 
     db: function() {
         return window.sqlitePlugin.openDatabase({
@@ -41,7 +41,7 @@ var ULogger = {
             location: 0,
             createFromLocation: 1
         });
-    }
+    },
 
     getMessagesFromIndex: function (startIndex, count, successCallback, errorCallback) {
         db().transaction(function(tx) {
@@ -60,7 +60,7 @@ var ULogger = {
                     errorCallback(e);
                 });
         });
-    }
+    },
 
     getMessagesForRange: function (startTime, endTime, successCallback, errorCallback) {
     }
