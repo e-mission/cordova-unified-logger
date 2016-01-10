@@ -35,26 +35,31 @@ var ULogger = {
         exec(null, errorCallback, "UnifiedLogger", "clear", []);
     },
 
-    db: function() {
-        return window.sqlitePlugin.openDatabase({
-            name: "loggerDB",
-            location: 0,
-            createFromLocation: 1
-        });
-    },
+    db: window.sqlitePlugin.openDatabase({
+        name: "loggerDB",
+        location: 0,
+        createFromLocation: 1
+    }),
 
     getMessagesFromIndex: function (startIndex, count, successCallback, errorCallback) {
-        db().transaction(function(tx) {
-            var selQuery = "SELECT * FROM "+LOG_TABLE+
-                           " WHERE "+KEY_ID+" > "+startIndex+
-                           " ORDER BY "+KEY_ID+" DESC LIMIT "+count;
+        ULogger.db.transaction(function(tx) {
+            var selQuery = "SELECT * FROM "+ULogger.LOG_TABLE+
+                           " WHERE "+ULogger.KEY_ID+" > "+startIndex+
+                           " ORDER BY "+ULogger.KEY_ID+" DESC LIMIT "+count;
             // Log statements in the logger don't go into the logger.
             // No infinite loop here!
-            console.log("About to execute query "+selQuery+" against "+LOG_TABLE);
+            console.log("About to execute query "+selQuery+" against "+ULogger.LOG_TABLE);
             tx.executeSql(selQuery,
                 [],
                 function(tx, data) {
-                    successCallback(data);
+                    var resultList = [];
+                    console.log("Result has "+data.rows.length+" rows");
+                    for (i = 0; i < data.rows.length; i++) {
+                        var currRow = data.rows.item(i);
+                        currRow.fmt_time = moment.unix(currRow.ts).format("llll");
+                        resultList.push(currRow);
+                    }
+                    successCallback(resultList);
                 },
                 function(e) {
                     errorCallback(e);
