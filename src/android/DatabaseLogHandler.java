@@ -42,7 +42,7 @@ public class DatabaseLogHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String CREATE_LOG_TABLE = "CREATE TABLE " + TABLE_LOG +" (" +
-                KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+ KEY_TS + " REAL, " +
+                KEY_ID + " INTEGER PRIMARY_KEY NOT NULL, "+ KEY_TS + " REAL, " +
                 KEY_LEVEL + " TEXT, " + KEY_MESSAGE +" TEXT)";
         System.out.println("CREATE_LOG_TABLE = " + CREATE_LOG_TABLE);
         sqLiteDatabase.execSQL(CREATE_LOG_TABLE);
