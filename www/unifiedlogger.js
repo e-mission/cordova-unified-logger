@@ -21,6 +21,22 @@ var ULogger = {
     LEVEL_ERROR: "ERROR",
 
     /*
+     * If this is not done, then we may read read the table before making any
+     * native calls, and on iOS, that will cause us to create a loggerDB
+     * instead of copying the template.
+     */
+    init: function() {
+        ULogger.log(ULogger.LEVEL_INFO, "finished init of native code", function(error) {
+            alert("Error "+error+" while initializing the unified logger");
+        });
+        ULogger.db = window.sqlitePlugin.openDatabase({
+            name: "loggerDB",
+            location: 0,
+            createFromLocation: 1
+        })
+    },
+
+    /*
      * Arguments:
      *  - tag: module or component name, such as "usercache" or "tracking"
      *  - errorCallback: function to pass any errors while logging.
@@ -34,12 +50,6 @@ var ULogger = {
     clearAll: function(successCallback, errorCallback) {
         exec(null, errorCallback, "UnifiedLogger", "clear", []);
     },
-
-    db: window.sqlitePlugin.openDatabase({
-        name: "loggerDB",
-        location: 0,
-        createFromLocation: 1
-    }),
 
     /*
      * The issue here is that we are returning the log in reverse chron order,
