@@ -60,7 +60,7 @@ var ULogger = {
      * index, to be passed to the getMessagesFromIndex function.
      */
     getMaxIndex: function (successCallback, errorCallback) {
-        ULogger.db.transaction(function(tx) {
+        ULogger.db.readTransaction(function(tx) {
             var maxIndexQuery = "SELECT MAX(ID) FROM "+ULogger.LOG_TABLE;
             console.log("About to execute query "+maxIndexQuery+" against "+ULogger.LOG_TABLE);
             tx.executeSql(maxIndexQuery,
@@ -80,7 +80,7 @@ var ULogger = {
     },
 
     getMessagesFromIndex: function (startIndex, count, successCallback, errorCallback) {
-        ULogger.db.transaction(function(tx) {
+        ULogger.db.readTransaction(function(tx) {
             var selQuery = "SELECT * FROM "+ULogger.LOG_TABLE+
                            " WHERE "+ULogger.KEY_ID+" < "+startIndex+
                            " ORDER BY "+ULogger.KEY_ID+" DESC LIMIT "+count;
