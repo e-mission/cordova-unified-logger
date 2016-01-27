@@ -5,13 +5,15 @@
 
 - (void)log:(CDVInvokedUrlCommand*)command
 {
-
     NSString* callbackId = [command callbackId];
-    NSString* level = [[command arguments] objectAtIndex:0];
-    NSString* message = [[command arguments] objectAtIndex:1];
-
     @try {
+        NSString* level = [[command arguments] objectAtIndex:0];
+        NSString* message = [[command arguments] objectAtIndex:1];
+
         [[DBLogging database] log:message atLevel:level];
+        CDVPluginResult* result = [CDVPluginResult
+                                   resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:result callbackId:callbackId];
     }
     @catch (NSException* e) {
         NSString* msg = [NSString stringWithFormat: @"While logging %@, error %@", message, e];
