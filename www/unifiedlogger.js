@@ -9,16 +9,32 @@ var ULogger = {
      * another plugin (assuming such a thing is possible, and provide a good
      * exemplar for the usercache plugin.
      */
-    var LOG_TABLE = "logTable";
-    var KEY_ID = "ID";
-    var KEY_TS = "ts";
-    var KEY_LEVEL = "level";
-    var KEY_MESSAGE = "message";
+    LOG_TABLE: "logTable",
+    KEY_ID: "ID",
+    KEY_TS: "ts",
+    KEY_LEVEL: "level",
+    KEY_MESSAGE: "message",
 
-    var LEVEL_DEBUG = "DEBUG";
-    var LEVEL_INFO = "INFO";
-    var LEVEL_WARN = "WARN";
-    var LEVEL_ERROR = "ERROR";
+    LEVEL_DEBUG: "DEBUG",
+    LEVEL_INFO: "INFO",
+    LEVEL_WARN: "WARN",
+    LEVEL_ERROR: "ERROR",
+
+    /*
+     * If this is not done, then we may read read the table before making any
+     * native calls, and on iOS, that will cause us to create a loggerDB
+     * instead of copying the template.
+     */
+    init: function() {
+        ULogger.log(ULogger.LEVEL_INFO, "finished init of native code", function(error) {
+            alert("Error "+error+" while initializing the unified logger");
+        });
+        ULogger.db = window.sqlitePlugin.openDatabase({
+            name: "loggerDB",
+            location: 0,
+            createFromLocation: 1
+        })
+    },
 
     /*
      * Arguments:
@@ -29,42 +45,69 @@ var ULogger = {
 
     log: function (level, message, errorCallback) {
         exec(null, errorCallback, "UnifiedLogger", "log", [level, message]);
-    }
+    },
 
     clearAll: function(successCallback, errorCallback) {
         exec(null, errorCallback, "UnifiedLogger", "clear", []);
-    }
+    },
 
-    db: function() {
-        return window.sqlitePlugin.openDatabase({
-            name: "loggerDB",
-            location: 0,
-            createFromLocation: 1
-        });
-    }
+    /*
+     * The issue here is that we are returning the log in reverse chron order,
+     * so that users don't have to load the entire database in order to see
+     * what's going on right now.  This means that we need to start the current
+     * index at the max index.  Unfortunately, we don't know what that is until
+     * we have started reading the database. This function returns the max
+     * index, to be passed to the getMessagesFromIndex function.
+     */
+    getMaxIndex: function (successCallback, errorCallback) {
+        ULogger.db.readTransaction(function(tx) {
+            var maxIndexQuery = "SELECT MAX(ID) FROM "+ULogger.LOG_TABLE;
+            console.log("About to execute query "+maxIndexQuery+" against "+ULogger.LOG_TABLE);
+            tx.executeSql(maxIndexQuery,
+                [],
+                function(tx, data) {
+                    if (data.rows.length == 0) {
+                        errorCallback("no max index returned - are there any index values? unable to retrieve logs")
+                    } else {
+                        var maxIndex = data.rows.item(0)["MAX(ID)"];
+                        successCallback(maxIndex);
+                    }
+                }, function(e, response) {
+                    errorCallback(response);
+                    return false;
+                })
+        })
+    },
 
     getMessagesFromIndex: function (startIndex, count, successCallback, errorCallback) {
-        db().transaction(function(tx) {
-            var selQuery = "SELECT * FROM "+LOG_TABLE+
-                           " WHERE "+KEY_ID+" > "+startIndex+
-                           " ORDER BY "+KEY_ID+" DESC LIMIT "+count;
+        ULogger.db.readTransaction(function(tx) {
+            var selQuery = "SELECT * FROM "+ULogger.LOG_TABLE+
+                           " WHERE "+ULogger.KEY_ID+" < "+startIndex+
+                           " ORDER BY "+ULogger.KEY_ID+" DESC LIMIT "+count;
             // Log statements in the logger don't go into the logger.
             // No infinite loop here!
-            console.log("About to execute query "+selQuery+" against "+LOG_TABLE);
+            console.log("About to execute query "+selQuery+" against "+ULogger.LOG_TABLE);
             tx.executeSql(selQuery,
                 [],
                 function(tx, data) {
-                    successCallback(data);
+                    var resultList = [];
+                    console.log("Result has "+data.rows.length+" rows");
+                    for (i = 0; i < data.rows.length; i++) {
+                        var currRow = data.rows.item(i);
+                        currRow.fmt_time = moment.unix(currRow.ts).format("llll");
+                        resultList.push(currRow);
+                    }
+                    successCallback(resultList);
                 },
-                function(e) {
-                    errorCallback(e);
+                function(e, response) {
+                    errorCallback(response);
+                    return false;
                 });
         });
-    }
+    },
 
     getMessagesForRange: function (startTime, endTime, successCallback, errorCallback) {
     }
-
 }
 
 module.exports = ULogger;

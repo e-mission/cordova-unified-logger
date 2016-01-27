@@ -26,14 +26,12 @@
 {
 
     NSString* callbackId = [command callbackId];
-    NSString* level = [[command arguments] objectAtIndex:0];
-    NSString* message = [[command arguments] objectAtIndex:1];
 
     @try {
         [[DBLogging database] clear];
     }
     @catch (NSException* e) {
-        NSString* msg = [NSString stringWithFormat: @"While logging %@, error %@", message, e];
+        NSString* msg = [NSString stringWithFormat: @"While clearing DB, error %@", e];
         CDVPluginResult* result = [CDVPluginResult
                                    resultWithStatus:CDVCommandStatus_ERROR
                                    messageAsString:msg];

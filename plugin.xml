@@ -44,7 +44,7 @@
     <header-file src="src/ios/BEMUnifiedLogger.h"/>
     <header-file src="src/ios/DBLogging.h"/>
     <source-file src="src/ios/BEMUnifiedLogger.m"/>
-    <header-file src="src/ios/DBLogging.m"/>
+    <source-file src="src/ios/DBLogging.m"/>
     <resource-file src="src/ios/loggerDB"/>
   </platform>
 </plugin>

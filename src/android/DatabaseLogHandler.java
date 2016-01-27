@@ -42,7 +42,7 @@ public class DatabaseLogHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String CREATE_LOG_TABLE = "CREATE TABLE " + TABLE_LOG +" (" +
-                KEY_ID + " INTEGER PRIMARY_KEY, "+ KEY_TS + " REAL, " +
+                KEY_ID + " INTEGER PRIMARY KEY NOT NULL, "+ KEY_TS + " REAL, " +
                 KEY_LEVEL + " TEXT, " + KEY_MESSAGE +" TEXT)";
         System.out.println("CREATE_LOG_TABLE = " + CREATE_LOG_TABLE);
         sqLiteDatabase.execSQL(CREATE_LOG_TABLE);
@@ -63,8 +63,6 @@ public class DatabaseLogHandler extends SQLiteOpenHelper {
     }
 
     public void clear() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_LOG, null, null);
-        db.close();
+        writeDB.delete(TABLE_LOG, null, null);
     }
 }
