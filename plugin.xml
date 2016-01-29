@@ -34,7 +34,7 @@
     <source-file src="src/android/UnifiedLogger.java" target-dir="src/edu/berkeley/eecs/emission/cordova/unifiedlogger"/>
     <source-file src="src/android/Log.java" target-dir="src/edu/berkeley/eecs/emission/cordova/unifiedlogger"/>
     <source-file src="src/android/DatabaseLogHandler.java" target-dir="src/edu/berkeley/eecs/emission/cordova/unifiedlogger"/>
-    <source-file src="src/android/NotificationHandler.java" target-dir="src/edu/berkeley/eecs/emission/cordova/unifiedlogger"/>
+    <source-file src="src/android/NotificationHelper.java" target-dir="src/edu/berkeley/eecs/emission/cordova/unifiedlogger"/>
   </platform>
 
   <platform name="ios">
