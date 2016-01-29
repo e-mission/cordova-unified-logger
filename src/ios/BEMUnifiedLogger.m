@@ -16,7 +16,7 @@
         [self.commandDelegate sendPluginResult:result callbackId:callbackId];
     }
     @catch (NSException* e) {
-        NSString* msg = [NSString stringWithFormat: @"While logging %@, error %@", message, e];
+        NSString* msg = [NSString stringWithFormat: @"While logging, error %@", e];
         CDVPluginResult* result = [CDVPluginResult
                                    resultWithStatus:CDVCommandStatus_ERROR
                                    messageAsString:msg];

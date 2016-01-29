@@ -7,7 +7,7 @@
 //
 
 #import "LocalNotificationManager.h"
-#import "Cordova/edu.berkeley.eecs.emission.cordova.unifiedlogger/DBLogging.h"
+#import "DBLogging.h"
 #import <UIKit/UIKit.h>
 
 @implementation LocalNotificationManager
