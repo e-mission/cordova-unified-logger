@@ -1,4 +1,4 @@
-package edu.berkeley.eecs.cfc_tracker;
+package edu.berkeley.eecs.emission.cordova.unifiedlogger;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -6,14 +6,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
-import edu.berkeley.eecs.emission.cordova.unifiedlogger.Log;
+import org.apache.cordova.CordovaActivity;
+
+import edu.berkeley.eecs.emission.CordovaApp;
+import edu.berkeley.eecs.emission.R;
 
 public class NotificationHelper {
 	private static String TAG = "NotificationHelper";
 
 	public static void createNotification(Context context, int id, String message) {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-		builder.setSmallIcon(R.drawable.ic_launcher);
+		builder.setSmallIcon(R.drawable.icon);
 		builder.setContentTitle(context.getString(R.string.app_name));
 		builder.setContentText(message);
 		
@@ -26,7 +29,7 @@ public class NotificationHelper {
 		 * 
 		 * TODO: Decide what level API we want to support, and whether we want a more comprehensive activity.
 		 */
-		Intent activityIntent = new Intent(context, MainActivity.class);
+		Intent activityIntent = new Intent(context, CordovaApp.class);
 		activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
 		PendingIntent activityPendingIntent = PendingIntent.getActivity(context, 0,
