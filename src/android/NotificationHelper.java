@@ -8,7 +8,7 @@ import android.support.v4.app.NotificationCompat;
 
 import org.apache.cordova.CordovaActivity;
 
-import edu.berkeley.eecs.emission.CordovaApp;
+import edu.berkeley.eecs.emission.MainActivity;
 import edu.berkeley.eecs.emission.R;
 
 public class NotificationHelper {
@@ -29,7 +29,7 @@ public class NotificationHelper {
 		 * 
 		 * TODO: Decide what level API we want to support, and whether we want a more comprehensive activity.
 		 */
-		Intent activityIntent = new Intent(context, CordovaApp.class);
+		Intent activityIntent = new Intent(context, MainActivity.class);
 		activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
 		PendingIntent activityPendingIntent = PendingIntent.getActivity(context, 0,
