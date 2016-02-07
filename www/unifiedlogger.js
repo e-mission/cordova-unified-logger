@@ -60,6 +60,7 @@ var ULogger = {
      * index, to be passed to the getMessagesFromIndex function.
      */
     getMaxIndex: function (successCallback, errorCallback) {
+        ULogger.ensureOpen();
         ULogger.db.readTransaction(function(tx) {
             var maxIndexQuery = "SELECT MAX(ID) FROM "+ULogger.LOG_TABLE;
             console.log("About to execute query "+maxIndexQuery+" against "+ULogger.LOG_TABLE);
@@ -76,10 +77,13 @@ var ULogger = {
                     errorCallback(response);
                     return false;
                 })
-        })
+        }, function(error) {
+            errorCallback(error);
+        });
     },
 
     getMessagesFromIndex: function (startIndex, count, successCallback, errorCallback) {
+        ULogger.ensureOpen();
         ULogger.db.readTransaction(function(tx) {
             var selQuery = "SELECT * FROM "+ULogger.LOG_TABLE+
                            " WHERE "+ULogger.KEY_ID+" < "+startIndex+
@@ -103,7 +107,18 @@ var ULogger = {
                     errorCallback(response);
                     return false;
                 });
+        }, function(error) {
+            errorCallback(error);
         });
+    },
+
+    ensureOpen: function() {
+        if (!(ULogger.db.dbname in ULogger.db.openDBs)) {
+            ULogger.log(ULogger.LEVEL_INFO, "re-opened closed database", function(error) {
+                alert("Error "+error+" while opening logging database");
+            });
+            ULogger.db.open();
+        };
     },
 
     getMessagesForRange: function (startTime, endTime, successCallback, errorCallback) {
