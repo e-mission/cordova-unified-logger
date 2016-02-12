@@ -3,6 +3,15 @@
 
 @implementation BEMUnifiedLogger
 
+- (void)pluginInitialize
+{
+    // TODO: We should consider adding a create statement to the init, similar
+    // to android - then it doesn't matter if the pre-populated database is not
+    // copied over.
+    NSLog(@"UnifiedLogger:pluginInitialize singleton -> initialize native DB");
+    [[DBLogging database] log:@"finished init of iOS native code" atLevel:@"INFO"];
+}
+
 - (void)log:(CDVInvokedUrlCommand*)command
 {
     NSString* callbackId = [command callbackId];

@@ -10,6 +10,10 @@ import edu.berkeley.eecs.emission.cordova.unifiedlogger.Log;
 
 public class UnifiedLogger extends CordovaPlugin {
 
+    protected void pluginInitialize() {
+        Log.log(cordova.getActivity(), "INFO", "UnifiedLogger", "finished init of android native code");
+    }
+
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
         if (action.equals("log")) {

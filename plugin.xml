@@ -28,6 +28,7 @@
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="UnifiedLogger">
         <param name="android-package" value="edu.berkeley.eecs.emission.cordova.unifiedlogger.UnifiedLogger"/>
+        <param name="onload" value="true"/>
       </feature>
     </config-file>
 
@@ -45,6 +46,7 @@
     <config-file target="config.xml" parent="/*">
       <feature name="UnifiedLogger">
         <param name="ios-package" value="BEMUnifiedLogger" />
+        <param name="onload" value="true"/>
       </feature>
     </config-file>
 

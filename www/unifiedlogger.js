@@ -26,9 +26,6 @@ var ULogger = {
      * instead of copying the template.
      */
     init: function() {
-        ULogger.log(ULogger.LEVEL_INFO, "finished init of native code", function(error) {
-            alert("Error "+error+" while initializing the unified logger");
-        });
         ULogger.db = window.sqlitePlugin.openDatabase({
             name: "loggerDB",
             location: 0,
