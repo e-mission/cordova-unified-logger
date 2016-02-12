@@ -25,12 +25,16 @@ var ULogger = {
      * native calls, and on iOS, that will cause us to create a loggerDB
      * instead of copying the template.
      */
-    init: function() {
-        ULogger.db = window.sqlitePlugin.openDatabase({
-            name: "loggerDB",
-            location: 0,
-            createFromLocation: 1
-        })
+    db: function() {
+        // One handle for each thread
+        if (ULogger.dbHandle == null) {
+            ULogger.dbHandle = window.sqlitePlugin.openDatabase({
+                name: "loggerDB",
+                location: 2,
+                createFromLocation: 1
+            });
+        }
+        return dbHandle;
     },
 
     /*
@@ -57,8 +61,7 @@ var ULogger = {
      * index, to be passed to the getMessagesFromIndex function.
      */
     getMaxIndex: function (successCallback, errorCallback) {
-        ULogger.ensureOpen();
-        ULogger.db.readTransaction(function(tx) {
+        ULogger.db().readTransaction(function(tx) {
             var maxIndexQuery = "SELECT MAX(ID) FROM "+ULogger.LOG_TABLE;
             console.log("About to execute query "+maxIndexQuery+" against "+ULogger.LOG_TABLE);
             tx.executeSql(maxIndexQuery,
@@ -80,8 +83,7 @@ var ULogger = {
     },
 
     getMessagesFromIndex: function (startIndex, count, successCallback, errorCallback) {
-        ULogger.ensureOpen();
-        ULogger.db.readTransaction(function(tx) {
+        ULogger.db().readTransaction(function(tx) {
             var selQuery = "SELECT * FROM "+ULogger.LOG_TABLE+
                            " WHERE "+ULogger.KEY_ID+" < "+startIndex+
                            " ORDER BY "+ULogger.KEY_ID+" DESC LIMIT "+count;
@@ -110,11 +112,11 @@ var ULogger = {
     },
 
     ensureOpen: function() {
-        if (!(ULogger.db.dbname in ULogger.db.openDBs)) {
+        if (!(ULogger.db().dbname in ULogger.db().openDBs)) {
             ULogger.log(ULogger.LEVEL_INFO, "re-opened closed database", function(error) {
                 alert("Error "+error+" while opening logging database");
             });
-            ULogger.db.open();
+            ULogger.db().open();
         };
     },
 
