@@ -34,7 +34,7 @@ var ULogger = {
                 createFromLocation: 1
             });
         }
-        return dbHandle;
+        return ULogger.dbHandle;
     },
 
     /*
