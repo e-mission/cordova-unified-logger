@@ -24,8 +24,10 @@ static int notificationCount = 0;
 }
 
 +(void)addNotification:(NSString *)notificationMessage showUI:(BOOL)showUI {
-    NSLog(@"Generating local notification with message %@", notificationMessage);
+    NSLog(@"%@", notificationMessage);
+    if (showUI) {
     notificationCount++;
+    }
     NSString* level = @"DEBUG";
     if (showUI) {
         level = @"INFO";
