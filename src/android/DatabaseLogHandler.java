@@ -56,7 +56,7 @@ public class DatabaseLogHandler extends SQLiteOpenHelper {
 
     public void log(String level, String message) {
         ContentValues cv = new ContentValues();
-        cv.put(KEY_TS, ((double)System.currentTimeMillis())/1000);
+        cv.put(KEY_TS, currentTimeSecs());
         cv.put(KEY_LEVEL, level);
         cv.put(KEY_MESSAGE, message);
         writeDB.insert(TABLE_LOG, null, cv);
@@ -64,5 +64,17 @@ public class DatabaseLogHandler extends SQLiteOpenHelper {
 
     public void clear() {
         writeDB.delete(TABLE_LOG, null, null);
+    }
+
+    public void truncateObsolete() {
+        // We somewhat arbitrarily decree that entries that are over a month old are obsolete
+        // This is to avoid unbounded growth of the log table
+        double monthAgoTs = currentTimeSecs() - 30 * 24 * 60 * 60; // 30 days * 24 hours * 60 minutes * 60 secs
+        log("INFO", "truncating obsolete entries before "+monthAgoTs);
+        writeDB.delete(TABLE_LOG, KEY_TS+" < "+monthAgoTs, null);
+    }
+
+    private double currentTimeSecs() {
+        return ((double)System.currentTimeMillis())/1000;
     }
 }

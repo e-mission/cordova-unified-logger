@@ -10,6 +10,7 @@
     // copied over.
     NSLog(@"UnifiedLogger:pluginInitialize singleton -> initialize native DB");
     [[DBLogging database] log:@"finished init of iOS native code" atLevel:@"INFO"];
+    [[DBLogging database] truncateObsolete];
 }
 
 - (void)log:(CDVInvokedUrlCommand*)command

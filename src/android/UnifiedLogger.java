@@ -12,6 +12,7 @@ public class UnifiedLogger extends CordovaPlugin {
 
     protected void pluginInitialize() {
         Log.log(cordova.getActivity(), "INFO", "UnifiedLogger", "finished init of android native code");
+        Log.truncateObsolete(cordova.getActivity());
     }
 
     @Override

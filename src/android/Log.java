@@ -37,12 +37,16 @@ public class Log {
             System.out.println("logger == null, lazily creating new logger");
             logger = new DatabaseLogHandler(ctxt);
         }
-        System.out.println("Returning logger "+logger);
+        // System.out.println("Returning logger "+logger);
         return logger;
     }
 
     public static void clear(Context ctxt) {
         getLogger(ctxt).clear();
+    }
+
+    public static void truncateObsolete(Context ctxt) {
+        getLogger(ctxt).truncateObsolete();
     }
 
     public static void log(Context ctxt, String level, String TAG, String message) {
