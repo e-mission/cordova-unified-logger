@@ -145,6 +145,19 @@ static DBLogging *_database;
 
 -(void)clear {
     NSString *deleteQuery = [NSString stringWithFormat:@"DELETE FROM %@", TABLE_LOG];
+    [self execDeleteStatement:deleteQuery];
+}
+
+-(void)truncateObsolete {
+    // We somewhat arbitrarily decree that entries that are over a month old are obsolete
+    // This is to avoid unbounded growth of the log table
+    double monthAgoTs = [NSDate date].timeIntervalSince1970 - 30 * 24 * 60 * 60; // 30 days * 24 hours * 60 minutes * 60 secs
+    [self log:[NSString stringWithFormat:@"truncating obsolete entries before %@", @(monthAgoTs)] atLevel:@"INFO"];
+    NSString *deleteQuery = [NSString stringWithFormat:@"DELETE FROM %@ WHERE %@ < %@", TABLE_LOG, KEY_TS, @(monthAgoTs)];
+    [self execDeleteStatement:deleteQuery];
+}
+  
+- (void) execDeleteStatement:(NSString*)deleteQuery {
     sqlite3_stmt *compiledStatement;
     NSInteger delPrepCode = sqlite3_prepare_v2(_database, [deleteQuery UTF8String], -1, &compiledStatement, NULL);
     if (delPrepCode == SQLITE_OK) {
@@ -161,6 +174,7 @@ static DBLogging *_database;
     }
     sqlite3_finalize(compiledStatement);
 }
+
 
 /*
  * END: database logging

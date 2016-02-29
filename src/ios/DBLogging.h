@@ -17,5 +17,6 @@
 
 -(void)log:(NSString*) message atLevel:(NSString*)level;
 -(void)clear;
+-(void)truncateObsolete;
 
 @end
