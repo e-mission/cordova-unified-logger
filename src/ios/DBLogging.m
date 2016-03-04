@@ -111,6 +111,7 @@ static DBLogging *_database;
  */
 
 -(void)log:(NSString *)message atLevel:(NSString*)level {
+    NSLog(@"%@: %@", level, message);
     NSString *insertStatement = [NSString stringWithFormat:@"INSERT INTO %@ (%@, %@, %@) VALUES (?, ?, ?)",
                                  TABLE_LOG, KEY_TS, KEY_LEVEL, KEY_MESSAGE];
     
