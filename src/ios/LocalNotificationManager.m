@@ -7,6 +7,7 @@
 //
 
 #import "LocalNotificationManager.h"
+#import "ConfigManager.h"
 #import "DBLogging.h"
 #import <UIKit/UIKit.h>
 
@@ -34,7 +35,10 @@ static int notificationCount = 0;
     }
     [[DBLogging database] log:notificationMessage atLevel:level];
 
-    if (showUI) {
+    // TODO: This adds a dependency between the notification manager and the config manager
+    // This is not a good thing, but it works for now
+    // Filed https://github.com/e-mission/e-mission-data-collection/issues/113 to track longer term issue
+    if (showUI && [ConfigManager instance].simulate_user_interaction) {
         UILocalNotification *localNotif = [[UILocalNotification alloc] init];
         if (localNotif) {
             localNotif.alertBody = notificationMessage;
