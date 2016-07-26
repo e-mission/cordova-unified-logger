@@ -45,6 +45,7 @@ var ULogger = {
      */
 
     log: function (level, message, errorCallback) {
+        console.log(level + ":" + message);
         exec(null, errorCallback, "UnifiedLogger", "log", [level, message]);
     },
 
