@@ -13,5 +13,6 @@
 +(void)clearNotifications;
 +(void)addNotification:(NSString*) notificationMessage;
 +(void)addNotification:(NSString*) notificationMessage showUI:(BOOL)showUI;
++(void)showNotification:(NSString*) notificationMessage;
 
 @end

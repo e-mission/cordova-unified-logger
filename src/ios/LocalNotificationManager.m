@@ -26,9 +26,6 @@ static int notificationCount = 0;
 
 +(void)addNotification:(NSString *)notificationMessage showUI:(BOOL)showUI {
     NSLog(@"%@", notificationMessage);
-    if (showUI) {
-    notificationCount++;
-    }
     NSString* level = @"DEBUG";
     if (showUI) {
         level = @"INFO";
@@ -39,6 +36,12 @@ static int notificationCount = 0;
     // This is not a good thing, but it works for now
     // Filed https://github.com/e-mission/e-mission-data-collection/issues/113 to track longer term issue
     if (showUI && [ConfigManager instance].simulate_user_interaction) {
+        [LocalNotificationManager showNotification:notificationMessage];
+    }
+}
+
++(void)showNotification:(NSString *)notificationMessage {
+    notificationCount++;
         UILocalNotification *localNotif = [[UILocalNotification alloc] init];
         if (localNotif) {
             localNotif.alertBody = notificationMessage;
@@ -46,6 +49,5 @@ static int notificationCount = 0;
             [[UIApplication sharedApplication] presentLocalNotificationNow:localNotif];
         }
     }
-}
 
 @end
