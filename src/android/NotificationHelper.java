@@ -42,4 +42,31 @@ public class NotificationHelper {
 		Log.d(context, TAG, "Generating notify with id " + id + " and message " + message);
 		nMgr.notify(id, builder.build());
 	}
+
+	/*
+	 * Used to show a pending intent - e.g. to turn on location services
+	 */
+	public static void createNotification(Context context, int id, String message, PendingIntent intent) {
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+		builder.setSmallIcon(R.drawable.icon);
+		builder.setContentTitle(context.getString(R.string.app_name));
+		builder.setContentText(message);
+
+		/*
+		 * This is a bit of magic voodoo. The tutorial on launching the activity actually uses a stackbuilder
+		 * to create a fake stack for the new activity. However, it looks like the stackbuilder
+		 * is only available in more recent versions of the API. So I use the version for a special activity PendingIntent
+		 * (since our app currently has only one activity) which resolves that issue.
+		 * This also appears to work, at least in the emulator.
+		 *
+		 * TODO: Decide what level API we want to support, and whether we want a more comprehensive activity.
+		 */
+		builder.setContentIntent(intent);
+
+		NotificationManager nMgr =
+				(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		Log.d(context, TAG, "Generating notify with id " + id + " and message " + message);
+		nMgr.notify(id, builder.build());
+	}
 }
