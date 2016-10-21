@@ -18,5 +18,7 @@
 -(void)log:(NSString*) message atLevel:(NSString*)level;
 -(void)clear;
 -(void)truncateObsolete;
+-(int)getMaxIndex;
+-(NSArray*) getMessagesFromIndex:(int)startIndex forCount:(int)count;
 
 @end

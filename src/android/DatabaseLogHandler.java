@@ -8,6 +8,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -72,6 +76,36 @@ public class DatabaseLogHandler extends SQLiteOpenHelper {
         double monthAgoTs = currentTimeSecs() - 30 * 24 * 60 * 60; // 30 days * 24 hours * 60 minutes * 60 secs
         log("INFO", "truncating obsolete entries before "+monthAgoTs);
         writeDB.delete(TABLE_LOG, KEY_TS+" < "+monthAgoTs, null);
+    }
+
+    public int getMaxIndex() {
+        String selectQuery = "SELECT MAX(ID) FROM "+TABLE_LOG;
+        Cursor queryVal = writeDB.rawQuery(selectQuery, null);
+        if (queryVal.moveToFirst()) {
+            return queryVal.getInt(0);
+        }
+        return -1;
+    }
+
+    public JSONArray getMessagesFromIndex(int startIndex, int count) throws JSONException {
+        JSONArray resultArr = new JSONArray();
+        String selectQuery = "SELECT * FROM "+TABLE_LOG
+                + " WHERE "+KEY_ID+" < "+startIndex
+                + " ORDER BY "+KEY_ID+" DESC LIMIT "+count;
+        Cursor queryVal = writeDB.rawQuery(selectQuery, null);
+        int resultCount = queryVal.getCount();
+        if (queryVal.moveToFirst()) {
+            for (int i=0; i < resultCount; i++) {
+                JSONObject currResult = new JSONObject();
+                currResult.put(KEY_ID, queryVal.getInt(0));
+                currResult.put(KEY_TS, queryVal.getDouble(1));
+                currResult.put(KEY_LEVEL, queryVal.getString(2));
+                currResult.put(KEY_MESSAGE, queryVal.getString(3));
+                resultArr.put(currResult);
+                queryVal.moveToNext();
+            }
+        }
+        return resultArr;
     }
 
     private double currentTimeSecs() {

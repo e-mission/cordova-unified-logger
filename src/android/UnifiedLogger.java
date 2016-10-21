@@ -41,6 +41,30 @@ public class UnifiedLogger extends CordovaPlugin {
                 callbackContext.error(exceptionAsString);
             }
             return true;
+        } else if (action.equals("getMaxIndex")) {
+            try {
+                callbackContext.success(Log.getMaxIndex(cordova.getActivity()));
+            } catch (Exception e) {
+                e.printStackTrace();
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                String exceptionAsString = sw.toString();
+                callbackContext.error(exceptionAsString);
+            }
+            return true;
+        } else if (action.equals("getMessagesFromIndex")) {
+            try {
+                int startIndex = data.getInt(0);
+                int count = data.getInt(1);
+                callbackContext.success(Log.getMessagesFromIndex(cordova.getActivity(), startIndex, count));
+            } catch (Exception e) {
+                e.printStackTrace();
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                String exceptionAsString = sw.toString();
+                callbackContext.error(exceptionAsString);
+            }
+            return true;
         } else {
             return false;
         }

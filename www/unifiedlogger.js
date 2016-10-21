@@ -44,13 +44,17 @@ var ULogger = {
      *    The expectation is that it takes a single argument.
      */
 
-    log: function (level, message, errorCallback) {
+    log: function (level, message) {
         console.log(level + ":" + message);
-        exec(null, errorCallback, "UnifiedLogger", "log", [level, message]);
+        return new Promise(function(resolve, reject) {
+            exec(resolve, reject, "UnifiedLogger", "log", [level, message]);
+        });
     },
 
-    clearAll: function(successCallback, errorCallback) {
-        exec(null, errorCallback, "UnifiedLogger", "clear", []);
+    clearAll: function() {
+        return new Promise(function(resolve, reject) {
+            exec(resolve, reject, "UnifiedLogger", "clear", []);
+        });
     },
 
     /*
@@ -61,54 +65,15 @@ var ULogger = {
      * we have started reading the database. This function returns the max
      * index, to be passed to the getMessagesFromIndex function.
      */
-    getMaxIndex: function (successCallback, errorCallback) {
-        ULogger.db().readTransaction(function(tx) {
-            var maxIndexQuery = "SELECT MAX(ID) FROM "+ULogger.LOG_TABLE;
-            console.log("About to execute query "+maxIndexQuery+" against "+ULogger.LOG_TABLE);
-            tx.executeSql(maxIndexQuery,
-                [],
-                function(tx, data) {
-                    if (data.rows.length == 0) {
-                        errorCallback("no max index returned - are there any index values? unable to retrieve logs")
-                    } else {
-                        var maxIndex = data.rows.item(0)["MAX(ID)"];
-                        successCallback(maxIndex);
-                    }
-                }, function(e, response) {
-                    errorCallback(response);
-                    return false;
-                })
-        }, function(error) {
-            errorCallback(error);
+    getMaxIndex: function () {
+        return new Promise(function(resolve, reject) {
+            exec(resolve, reject, "UnifiedLogger", "getMaxIndex", []);
         });
     },
 
-    getMessagesFromIndex: function (startIndex, count, successCallback, errorCallback) {
-        ULogger.db().readTransaction(function(tx) {
-            var selQuery = "SELECT * FROM "+ULogger.LOG_TABLE+
-                           " WHERE "+ULogger.KEY_ID+" < "+startIndex+
-                           " ORDER BY "+ULogger.KEY_ID+" DESC LIMIT "+count;
-            // Log statements in the logger don't go into the logger.
-            // No infinite loop here!
-            console.log("About to execute query "+selQuery+" against "+ULogger.LOG_TABLE);
-            tx.executeSql(selQuery,
-                [],
-                function(tx, data) {
-                    var resultList = [];
-                    console.log("Result has "+data.rows.length+" rows");
-                    for (i = 0; i < data.rows.length; i++) {
-                        var currRow = data.rows.item(i);
-                        currRow.fmt_time = moment.unix(currRow.ts).format("llll");
-                        resultList.push(currRow);
-                    }
-                    successCallback(resultList);
-                },
-                function(e, response) {
-                    errorCallback(response);
-                    return false;
-                });
-        }, function(error) {
-            errorCallback(error);
+    getMessagesFromIndex: function (startIndex, count) {
+        return new Promise(function(resolve, reject) {
+            exec(resolve, reject, "UnifiedLogger", "getMessagesFromIndex", [startIndex, count]);
         });
     },
 

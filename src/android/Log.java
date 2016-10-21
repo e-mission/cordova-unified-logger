@@ -3,6 +3,9 @@ package edu.berkeley.eecs.emission.cordova.unifiedlogger;
 import android.content.Context;
 import android.os.Environment;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -43,6 +46,15 @@ public class Log {
 
     public static void clear(Context ctxt) {
         getLogger(ctxt).clear();
+    }
+
+    public static int getMaxIndex(Context ctxt) {
+        return getLogger(ctxt).getMaxIndex();
+    }
+
+    public static JSONArray getMessagesFromIndex(Context ctxt, int startIndex, int count)
+            throws JSONException {
+        return getLogger(ctxt).getMessagesFromIndex(startIndex, count);
     }
 
     public static void truncateObsolete(Context ctxt) {

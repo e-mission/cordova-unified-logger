@@ -176,6 +176,59 @@ static DBLogging *_database;
     sqlite3_finalize(compiledStatement);
 }
 
+-(int)getMaxIndex {
+    NSString* selectQuery = [NSString stringWithFormat:@"SELECT MAX(ID) FROM %@", TABLE_LOG];
+    sqlite3_stmt *compiledStatement;
+    NSInteger selPrepCode = sqlite3_prepare_v2(_database, [selectQuery UTF8String], -1, &compiledStatement, NULL);
+    if (selPrepCode == SQLITE_OK) {
+        if (sqlite3_step(compiledStatement) == SQLITE_ROW) {
+            return sqlite3_column_int(compiledStatement, 0);
+        }
+    }
+    return -1;
+}
+
+- (NSString*) toNSString:(char*)cString
+{
+    if (cString == NULL) {
+        return @"none";
+    } else {
+        return [[NSString alloc] initWithUTF8String:cString];
+    }
+}
+
+- (NSArray*) readSelectResults:(NSString*) selectQuery {
+    NSMutableArray* retVal = [[NSMutableArray alloc] init];
+    
+    sqlite3_stmt *compiledStatement;
+    NSInteger selPrepCode = sqlite3_prepare_v2(_database, [selectQuery UTF8String], -1, &compiledStatement, NULL);
+    if (selPrepCode == SQLITE_OK) {
+        while (sqlite3_step(compiledStatement) == SQLITE_ROW) {
+            NSMutableDictionary* currRow = [[NSMutableDictionary alloc] init];
+            int nCols = sqlite3_column_count(compiledStatement);
+            if (nCols != 4) {
+               NSLog(@"Found %d cols, expected 4", nCols);
+            }
+            // Remember that while reading results, the index starts from 0
+            currRow[KEY_ID] = @((int)sqlite3_column_int(compiledStatement, 0));
+            currRow[KEY_TS] = @((double)sqlite3_column_double(compiledStatement, 1));
+            currRow[KEY_LEVEL] = [self toNSString:(char*)sqlite3_column_text(compiledStatement, 2)];
+            currRow[KEY_MESSAGE] = [self toNSString:(char*)sqlite3_column_text(compiledStatement, 3)];
+            [retVal addObject:currRow];
+        }
+    } else {
+        NSLog(@"Error code %ld while compiling query %@", (long)selPrepCode, selectQuery);
+    }
+    sqlite3_finalize(compiledStatement);
+    return retVal;
+}
+
+-(NSArray*) getMessagesFromIndex:(int)startIndex forCount:(int)count {
+    NSString* selectQuery = [NSString stringWithFormat:@"SELECT * FROM %@ WHERE %@ < %d ORDER BY %@ DESC LIMIT %d",
+                             TABLE_LOG, KEY_ID, startIndex, KEY_ID, count];
+    return [self readSelectResults:selectQuery];
+}
+
 
 /*
  * END: database logging
