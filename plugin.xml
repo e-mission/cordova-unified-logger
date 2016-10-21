@@ -20,9 +20,6 @@
     <clobbers target="Logger" />
   </js-module>
 
-  <dependency id="cordova-sqlite-storage"
-             url="https://github.com/litehelpers/Cordova-sqlite-storage.git"/>
-
   <platform name="android">
 
     <config-file target="res/xml/config.xml" parent="/*">

@@ -36,11 +36,52 @@
 
 - (void)clear:(CDVInvokedUrlCommand*)command
 {
-
     NSString* callbackId = [command callbackId];
 
     @try {
         [[DBLogging database] clear];
+    }
+    @catch (NSException* e) {
+        NSString* msg = [NSString stringWithFormat: @"While clearing DB, error %@", e];
+        CDVPluginResult* result = [CDVPluginResult
+                                   resultWithStatus:CDVCommandStatus_ERROR
+                                   messageAsString:msg];
+        [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+    }
+}
+
+- (void)getMaxIndex:(CDVInvokedUrlCommand*)command
+{
+    NSString* callbackId = [command callbackId];
+    
+    @try {
+        int maxInt = [[DBLogging database] getMaxIndex];
+        CDVPluginResult* result = [CDVPluginResult
+                                   resultWithStatus:CDVCommandStatus_OK
+                                   messageAsInt: maxInt];
+        [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+    }
+    @catch (NSException* e) {
+        NSString* msg = [NSString stringWithFormat: @"While clearing DB, error %@", e];
+        CDVPluginResult* result = [CDVPluginResult
+                                   resultWithStatus:CDVCommandStatus_ERROR
+                                   messageAsString:msg];
+        [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+    }
+}
+
+- (void)getMessagesFromIndex:(CDVInvokedUrlCommand*)command
+{
+    NSString* callbackId = [command callbackId];
+    
+    @try {
+        int startIndex = [[[command arguments] objectAtIndex:0] intValue];
+        int count = [[[command arguments] objectAtIndex:1] intValue];
+        NSArray* resultArray = [[DBLogging database] getMessagesFromIndex:startIndex forCount:count];
+        CDVPluginResult* result = [CDVPluginResult
+                                   resultWithStatus:CDVCommandStatus_OK
+                                   messageAsArray:resultArray];
+        [self.commandDelegate sendPluginResult:result callbackId:callbackId];
     }
     @catch (NSException* e) {
         NSString* msg = [NSString stringWithFormat: @"While clearing DB, error %@", e];
