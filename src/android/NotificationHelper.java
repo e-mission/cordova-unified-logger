@@ -62,6 +62,7 @@ public class NotificationHelper {
 		 * TODO: Decide what level API we want to support, and whether we want a more comprehensive activity.
 		 */
 		builder.setContentIntent(intent);
+		builder.setAutoCancel(true);
 
 		NotificationManager nMgr =
 				(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
