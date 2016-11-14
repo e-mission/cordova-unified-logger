@@ -41,6 +41,7 @@ static int notificationCount = 0;
 }
 
 +(void)showNotification:(NSString *)notificationMessage {
+    [LocalNotificationManager addNotification:notificationMessage];
     notificationCount++;
         UILocalNotification *localNotif = [[UILocalNotification alloc] init];
         if (localNotif) {
@@ -49,5 +50,17 @@ static int notificationCount = 0;
             [[UIApplication sharedApplication] presentLocalNotificationNow:localNotif];
         }
     }
+
++(void)showNotificationAfterSecs:(NSString *)notificationMessage secsLater:(int)secsLater {
+    [LocalNotificationManager addNotification:notificationMessage];
+    notificationCount++;
+    UILocalNotification *localNotif = [[UILocalNotification alloc] init];
+    if (localNotif) {
+        localNotif.alertBody = notificationMessage;
+        localNotif.applicationIconBadgeNumber = notificationCount;
+        localNotif.fireDate = [NSDate dateWithTimeIntervalSinceNow:secsLater];
+        [[UIApplication sharedApplication] scheduleLocalNotification:localNotif];
+    }
+}
 
 @end
