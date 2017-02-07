@@ -36,6 +36,12 @@
     <source-file src="src/android/Log.java" target-dir="src/edu/berkeley/eecs/emission/cordova/unifiedlogger"/>
     <source-file src="src/android/DatabaseLogHandler.java" target-dir="src/edu/berkeley/eecs/emission/cordova/unifiedlogger"/>
     <source-file src="src/android/NotificationHelper.java" target-dir="src/edu/berkeley/eecs/emission/cordova/unifiedlogger"/>
+
+    <!--  drawable res/android -->
+    <resource-file src="res/android/drawable-hdpi/ic_visibility_black_24dp.png" target="res/drawable-hdpi/ic_visibility_black.png" />
+    <resource-file src="res/android/drawable-mdpi/ic_visibility_black_24dp.png" target="res/drawable-mdpi/ic_visibility_black.png" />
+    <resource-file src="res/android/drawable-xhdpi/ic_visibility_black_24dp.png" target="res/drawable-xhdpi/ic_visibility_black.png" />
+    <resource-file src="res/android/drawable-xxhdpi/ic_visibility_black_24dp.png" target="res/drawable-xxhdpi/ic_visibility_black.png" />
   </platform>
 
   <platform name="ios">

@@ -4,6 +4,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 
 import org.apache.cordova.CordovaActivity;
@@ -16,7 +18,9 @@ public class NotificationHelper {
 
 	public static void createNotification(Context context, int id, String message) {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-		builder.setSmallIcon(R.drawable.icon);
+		Bitmap appIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon);
+		builder.setLargeIcon(appIcon);
+		builder.setSmallIcon(R.drawable.ic_visibility_black);
 		builder.setContentTitle(context.getString(R.string.app_name));
 		builder.setContentText(message);
 		
@@ -48,7 +52,9 @@ public class NotificationHelper {
 	 */
 	public static void createNotification(Context context, int id, String message, PendingIntent intent) {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-		builder.setSmallIcon(R.drawable.icon);
+		Bitmap appIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon);
+		builder.setLargeIcon(appIcon);
+		builder.setSmallIcon(R.drawable.ic_visibility_black);
 		builder.setContentTitle(context.getString(R.string.app_name));
 		builder.setContentText(message);
 
