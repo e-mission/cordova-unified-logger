@@ -14,6 +14,7 @@
 +(void)addNotification:(NSString*) notificationMessage;
 +(void)addNotification:(NSString*) notificationMessage showUI:(BOOL)showUI;
 +(void)showNotification:(NSString*) notificationMessage;
-+(void)showNotificationAfterSecs:(NSString *)notificationMessage secsLater:(int)secsLater;
++(void)showNotificationAfterSecs:(NSString *)notificationMessage withUserInfo:(NSDictionary*)userInfo
+                                                                    secsLater:(int)secsLater;
 
 @end
