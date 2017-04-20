@@ -51,13 +51,17 @@ static int notificationCount = 0;
         }
     }
 
-+(void)showNotificationAfterSecs:(NSString *)notificationMessage secsLater:(int)secsLater {
++(void)showNotificationAfterSecs:(NSString *)notificationMessage withUserInfo:(NSDictionary*)userInfo
+                                                                    secsLater:(int)secsLater {
     [LocalNotificationManager addNotification:notificationMessage];
     notificationCount++;
     UILocalNotification *localNotif = [[UILocalNotification alloc] init];
     if (localNotif) {
         localNotif.alertBody = notificationMessage;
-        localNotif.applicationIconBadgeNumber = notificationCount;
+        // localNotif.applicationIconBadgeNumber = notificationCount;
+        if (userInfo != NULL) {
+            localNotif.userInfo = userInfo;
+        }
         localNotif.fireDate = [NSDate dateWithTimeIntervalSinceNow:secsLater];
         [[UIApplication sharedApplication] scheduleLocalNotification:localNotif];
     }
