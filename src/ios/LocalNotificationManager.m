@@ -44,6 +44,7 @@ static int notificationCount = 0;
     [LocalNotificationManager addNotification:notificationMessage];
     notificationCount++;
         UILocalNotification *localNotif = [[UILocalNotification alloc] init];
+        localNotif.userInfo = @{};
         if (localNotif) {
             localNotif.alertBody = notificationMessage;
             localNotif.applicationIconBadgeNumber = notificationCount;
@@ -61,6 +62,8 @@ static int notificationCount = 0;
         // localNotif.applicationIconBadgeNumber = notificationCount;
         if (userInfo != NULL) {
             localNotif.userInfo = userInfo;
+        } else {
+            localNotif.userInfo = @{};
         }
         localNotif.fireDate = [NSDate dateWithTimeIntervalSinceNow:secsLater];
         [[UIApplication sharedApplication] scheduleLocalNotification:localNotif];
