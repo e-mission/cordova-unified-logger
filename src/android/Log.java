@@ -12,6 +12,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Formatter;
@@ -104,5 +106,17 @@ public class Log {
             e.printStackTrace();
         }
         android.util.Log.e(TAG, message);
+    }
+
+    public static void exception(Context ctxt, String TAG, Exception exp) {
+        try {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            exp.printStackTrace(pw);
+            Log.e(ctxt, TAG, pw.toString());
+            android.util.Log.e(TAG, pw.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
