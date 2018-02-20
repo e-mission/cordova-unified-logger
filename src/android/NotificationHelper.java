@@ -1,5 +1,6 @@
 package edu.berkeley.eecs.emission.cordova.unifiedlogger;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -17,13 +18,7 @@ public class NotificationHelper {
 	private static String TAG = "NotificationHelper";
 
 	public static void createNotification(Context context, int id, String message) {
-		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-		Bitmap appIcon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.icon);
-		builder.setLargeIcon(appIcon);
-		builder.setSmallIcon(R.drawable.ic_visibility_black);
-		builder.setContentTitle(context.getString(R.string.app_name));
-		builder.setContentText(message);
-		
+		Notification.Builder builder = getNotificationBuilderForApp(context, message);
 		/*
 		 * This is a bit of magic voodoo. The tutorial on launching the activity actually uses a stackbuilder
 		 * to create a fake stack for the new activity. However, it looks like the stackbuilder
@@ -51,12 +46,7 @@ public class NotificationHelper {
 	 * Used to show a pending intent - e.g. to turn on location services
 	 */
 	public static void createNotification(Context context, int id, String message, PendingIntent intent) {
-		NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-		Bitmap appIcon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.icon);
-		builder.setLargeIcon(appIcon);
-		builder.setSmallIcon(R.drawable.ic_visibility_black);
-		builder.setContentTitle(context.getString(R.string.app_name));
-		builder.setContentText(message);
+		Notification.Builder builder = getNotificationBuilderForApp(context, message);
 
 		/*
 		 * This is a bit of magic voodoo. The tutorial on launching the activity actually uses a stackbuilder
@@ -75,5 +65,16 @@ public class NotificationHelper {
 
 		Log.d(context, TAG, "Generating notify with id " + id + " and message " + message);
 		nMgr.notify(id, builder.build());
+	}
+
+	public static Notification.Builder getNotificationBuilderForApp(Context context, String message) {
+		Notification.Builder builder = new Notification.Builder(context);
+		Bitmap appIcon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.icon);
+		builder.setLargeIcon(appIcon);
+		builder.setSmallIcon(R.drawable.ic_visibility_black);
+		builder.setContentTitle(context.getString(R.string.app_name));
+		builder.setContentText(message);
+
+		return builder;
 	}
 }
