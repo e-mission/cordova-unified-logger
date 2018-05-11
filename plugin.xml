@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         id="edu.berkeley.eecs.emission.cordova.unifiedlogger"
-        version="1.0.2">
+        version="1.1.0">
 
   <name>UnifiedLogger</name>
   <description>Log messages from both native code and javacript. Since this is
@@ -19,6 +19,8 @@
   <js-module src="www/unifiedlogger.js" name="unifiedlogger">
     <clobbers target="Logger" />
   </js-module>
+
+  <hook type="after_plugin_install" src="hooks/android/addResourcesClassImport.js" />
 
   <platform name="android">
 
