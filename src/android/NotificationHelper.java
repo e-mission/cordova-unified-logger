@@ -1,8 +1,4 @@
 package edu.berkeley.eecs.emission.cordova.unifiedlogger;
-// Auto fixed by post-plugin hook 
-import edu.berkeley.eecs.embase.MainActivity; 
-// Auto fixed by post-plugin hook 
-import edu.berkeley.eecs.embase.R;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -16,8 +12,8 @@ import android.support.v4.app.NotificationCompat;
 
 import org.apache.cordova.CordovaActivity;
 
-
-
+import edu.berkeley.eecs.emission.MainActivity;
+import edu.berkeley.eecs.emission.R;
 
 public class NotificationHelper {
 	private static String TAG = "NotificationHelper";
@@ -77,6 +73,14 @@ public class NotificationHelper {
 
 		Log.d(context, TAG, "Generating notify with id " + id + " and message " + message);
 		nMgr.notify(id, builder.build());
+	}
+
+	public static void cancelNotification(Context context, int id) {
+		NotificationManager nMgr =
+				(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		Log.d(context, TAG, "Cancelling notify with id " + id);
+		nMgr.cancel(id);
 	}
 
 	public static Notification.Builder getNotificationBuilderForApp(Context context, String message) {
