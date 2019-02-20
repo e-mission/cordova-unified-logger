@@ -71,7 +71,8 @@ public class NotificationHelper {
 		NotificationManager nMgr =
 				(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		Log.d(context, TAG, "Generating notify with id " + id + " and message " + message);
+		Log.d(context, TAG, "Generating notify with id " + id + ", message " + message
+				+ " and pending intent " + intent);
 		nMgr.notify(id, builder.build());
 	}
 
