@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
 import org.apache.cordova.CordovaActivity;
@@ -16,6 +17,7 @@ import edu.berkeley.eecs.emission.R;
 
 public class NotificationHelper {
 	private static String TAG = "NotificationHelper";
+	public static final String RESOLUTION_PENDING_INTENT_KEY = "rpIntentKey";
 
 	public static void createNotification(Context context, int id, String message) {
 		Notification.Builder builder = getNotificationBuilderForApp(context, message);
@@ -57,14 +59,29 @@ public class NotificationHelper {
 		 *
 		 * TODO: Decide what level API we want to support, and whether we want a more comprehensive activity.
 		 */
-		builder.setContentIntent(intent);
-		builder.setAutoCancel(true);
+		Intent activityIntent = new Intent(context, MainActivity.class);
+		activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		activityIntent.putExtra(NotificationHelper.RESOLUTION_PENDING_INTENT_KEY, intent);
+
+		PendingIntent activityPendingIntent = PendingIntent.getActivity(context, 0,
+				activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		builder.setContentIntent(activityPendingIntent);
+		// builder.setAutoCancel(true);
 
 		NotificationManager nMgr =
 				(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		Log.d(context, TAG, "Generating notify with id " + id + " and message " + message);
+		Log.d(context, TAG, "Generating notify with id " + id + ", message " + message
+				+ " and pending intent " + intent);
 		nMgr.notify(id, builder.build());
+	}
+
+	public static void cancelNotification(Context context, int id) {
+		NotificationManager nMgr =
+				(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		Log.d(context, TAG, "Cancelling notify with id " + id);
+		nMgr.cancel(id);
 	}
 
 	public static Notification.Builder getNotificationBuilderForApp(Context context, String message) {
