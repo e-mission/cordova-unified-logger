@@ -1,12 +1,14 @@
 package edu.berkeley.eecs.emission.cordova.unifiedlogger;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
@@ -14,13 +16,18 @@ import org.apache.cordova.CordovaActivity;
 
 import edu.berkeley.eecs.emission.MainActivity;
 import edu.berkeley.eecs.emission.R;
+import java.util.List;
+
 
 public class NotificationHelper {
 	private static String TAG = "NotificationHelper";
 	public static final String RESOLUTION_PENDING_INTENT_KEY = "rpIntentKey";
 
 	public static void createNotification(Context context, int id, String message) {
-		Notification.Builder builder = getNotificationBuilderForApp(context, message);
+		NotificationManager nMgr =
+				(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		Notification.Builder builder = getNotificationBuilderForApp(context, nMgr, message);
 		/*
 		 * This is a bit of magic voodoo. The tutorial on launching the activity actually uses a stackbuilder
 		 * to create a fake stack for the new activity. However, it looks like the stackbuilder
@@ -37,9 +44,6 @@ public class NotificationHelper {
 				activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		builder.setContentIntent(activityPendingIntent);		
 		
-		NotificationManager nMgr =
-				(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
-		
 		Log.d(context, TAG, "Generating notify with id " + id + " and message " + message);
 		nMgr.notify(id, builder.build());
 	}
@@ -48,7 +52,10 @@ public class NotificationHelper {
 	 * Used to show a pending intent - e.g. to turn on location services
 	 */
 	public static void createNotification(Context context, int id, String message, PendingIntent intent) {
-		Notification.Builder builder = getNotificationBuilderForApp(context, message);
+		NotificationManager nMgr =
+				(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		Notification.Builder builder = getNotificationBuilderForApp(context, nMgr, message);
 
 		/*
 		 * This is a bit of magic voodoo. The tutorial on launching the activity actually uses a stackbuilder
@@ -68,9 +75,6 @@ public class NotificationHelper {
 		builder.setContentIntent(activityPendingIntent);
 		// builder.setAutoCancel(true);
 
-		NotificationManager nMgr =
-				(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
-
 		Log.d(context, TAG, "Generating notify with id " + id + ", message " + message
 				+ " and pending intent " + intent);
 		nMgr.notify(id, builder.build());
@@ -84,8 +88,21 @@ public class NotificationHelper {
 		nMgr.cancel(id);
 	}
 
-	public static Notification.Builder getNotificationBuilderForApp(Context context, String message) {
-		Notification.Builder builder = new Notification.Builder(context);
+	public static Notification.Builder getNotificationBuilderForApp(Context context,
+																	NotificationManager nMgr,
+																	String message) {
+		Notification.Builder builder = null;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			List<NotificationChannel> channels = nMgr.getNotificationChannels();
+			String channelID;
+			if (channels.size() < 1) {
+				throw new AssertionError("Did not find any channels, no notifications will be generated");
+			}
+			channelID = channels.get(0).getId();
+			builder = new Notification.Builder(context, channelID);
+		} else {
+			builder = new Notification.Builder(context);
+		}
 		Bitmap appIcon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.icon);
 		builder.setLargeIcon(appIcon);
 		builder.setSmallIcon(R.drawable.ic_visibility_black);
