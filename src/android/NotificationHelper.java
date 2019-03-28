@@ -134,7 +134,7 @@ public class NotificationHelper {
 
 			Log.d(ctxt, TAG, "Default channel not found, creating a new one");
 			NotificationChannel dChannel = new NotificationChannel(DEFAULT_CHANNEL_ID,
-					DEFAULT_CHANNEL_DESCRIPTION, NotificationManager.IMPORTANCE_DEFAULT);
+					DEFAULT_CHANNEL_DESCRIPTION, NotificationManager.IMPORTANCE_LOW);
 			dChannel.enableVibration(true);
 			notificationManager.createNotificationChannel(dChannel);
 		}
