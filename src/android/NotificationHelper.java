@@ -107,7 +107,7 @@ public class NotificationHelper {
 		} else {
 			builder = new Notification.Builder(context);
 		}
-		Bitmap appIcon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.icon);
+		Bitmap appIcon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
 		builder.setLargeIcon(appIcon);
 		builder.setSmallIcon(R.drawable.ic_visibility_black);
 		builder.setContentTitle(context.getString(R.string.app_name));
