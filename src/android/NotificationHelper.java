@@ -1,5 +1,12 @@
 package edu.berkeley.eecs.emission.cordova.unifiedlogger;
 
+import de.appplant.cordova.plugin.localnotification.TriggerReceiver;
+import de.appplant.cordova.plugin.notification.Manager;
+import de.appplant.cordova.plugin.notification.Options;
+import de.appplant.cordova.plugin.notification.Request;
+import edu.berkeley.eecs.emission.MainActivity;
+import edu.berkeley.eecs.emission.R;
+
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -10,13 +17,11 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
-import android.os.Bundle;
-import androidx.core.app.NotificationCompat;
 
-import org.apache.cordova.CordovaActivity;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import edu.berkeley.eecs.emission.MainActivity;
-import edu.berkeley.eecs.emission.R;
 
 import java.util.List;
 
@@ -28,11 +33,11 @@ public class NotificationHelper {
 	public static final String DISPLAY_RESOLUTION_ACTION = "DISPLAY_RESOLUTION";
 	public static final String RESOLUTION_PENDING_INTENT_KEY = "rpIntentKey";
 
-	public static void createNotification(Context context, int id, String message) {
+	public static void createNotification(Context context, int id, String title, String message) {
 		NotificationManager nMgr =
 				(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		Notification.Builder builder = getNotificationBuilderForApp(context, nMgr, message);
+		Notification.Builder builder = getNotificationBuilderForApp(context, title, message);
 		/*
 		 * This is a bit of magic voodoo. The tutorial on launching the activity actually uses a stackbuilder
 		 * to create a fake stack for the new activity. However, it looks like the stackbuilder
@@ -53,11 +58,11 @@ public class NotificationHelper {
 		nMgr.notify(id, builder.build());
 	}
 
-	public static void createNotification(Context context, int id, String message, PendingIntent intent) {
+	public static void createNotification(Context context, int id, String title, String message, PendingIntent intent) {
 		NotificationManager nMgr =
 				(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		Notification.Builder builder = getNotificationBuilderForApp(context, nMgr, message);
+		Notification.Builder builder = getNotificationBuilderForApp(context, title , message);
 		builder.setContentIntent(intent);
 
 		Log.d(context, TAG, "Generating notify with id " + id + ", message " + message
@@ -68,11 +73,11 @@ public class NotificationHelper {
 		/*
 	 * Used to show a resolution - e.g. to turn on location services
 		 */
-	public static void createResolveNotification(Context context, int id, String message, PendingIntent intent) {
+	public static void createResolveNotification(Context context, int id, String title, String message, PendingIntent intent) {
 		NotificationManager nMgr =
 				(NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		Notification.Builder builder = getNotificationBuilderForApp(context, nMgr, message);
+		Notification.Builder builder = getNotificationBuilderForApp(context, title, message);
 
 		Intent activityIntent = new Intent(context, MainActivity.class);
 		activityIntent.setAction(DISPLAY_RESOLUTION_ACTION);
@@ -98,8 +103,7 @@ public class NotificationHelper {
 	}
 
 	public static Notification.Builder getNotificationBuilderForApp(Context context,
-																	NotificationManager nMgr,
-																	String message) {
+                                                                  String title, String message) {
 		Notification.Builder builder = null;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			createDefaultNotificationChannelIfNeeded(context);
@@ -110,11 +114,16 @@ public class NotificationHelper {
 		Bitmap appIcon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
 		builder.setLargeIcon(appIcon);
 		builder.setSmallIcon(R.drawable.ic_visibility_black);
-		builder.setContentTitle(context.getString(R.string.app_name));
+		if (title == null) {
+		  title = context.getString(R.string.app_name);
+    }
+		builder.setContentTitle(title);
 		builder.setContentText(message);
 
 		return builder;
 	}
+
+
 
 	@TargetApi(26)
 	private static void createDefaultNotificationChannelIfNeeded(final Context ctxt) {
@@ -139,4 +148,68 @@ public class NotificationHelper {
 			notificationManager.createNotificationChannel(dChannel);
 		}
 	}
+
+	/*
+	 * Schedules a local notification in a way that is compatible with the local notification plugin
+	 * so that we can get a callback in javascript.
+	 * The notifyConfig has the basic information required for scheduling such as the title,
+	 * the message, the time to schedule, etc. Some of these fields are required, so we will them
+	 * in with defaults if they are not present.
+	 * Fixed earlier in:
+	 * https://github.com/e-mission/e-mission-transition-notify/commit/ec75e28fcc649c54eed65bb8d7e6dc7374336a87
+   *
+   * Example of expected value
+	 * e.g. https://github.com/katzer/cordova-plugin-local-notifications/blob/caff55ec758fdf298029ae98aff7f6a8a097feac/src/android/notification/Options.java#L517
+	 *
+	 * We pass in the data separately from the config to support the use case of a standard config
+	 * with configurable data.
+	 */
+
+	public static void schedulePluginCompatibleNotification(Context ctxt,
+                                                   JSONObject currNotifyConfig,
+                                                   JSONObject newData) {
+	  try {
+      fillWithDefaults(ctxt, currNotifyConfig, "data", new JSONObject());
+      JSONObject defaultTrigger = new JSONObject();
+      defaultTrigger.put("type", "calendar");
+      fillWithDefaults(ctxt, currNotifyConfig, "trigger", defaultTrigger);
+      JSONObject defaultProgressBar = new JSONObject();
+      defaultProgressBar.put("enabled", false);
+      fillWithDefaults(ctxt, currNotifyConfig, "progressBar", defaultProgressBar);
+      JSONObject currData = currNotifyConfig.optJSONObject("data");
+      if (newData != null) {
+        mergeObjects(currData, newData);
+      }
+      Manager.getInstance(ctxt).schedule(new Request(new Options(currNotifyConfig)), TriggerReceiver.class);
+    } catch (JSONException e) {
+      Log.e(ctxt, TAG, e.getMessage());
+      Log.e(ctxt, TAG, e.toString());
+    }
+  }
+
+  private static void mergeObjects(JSONObject existing, JSONObject autogen) throws JSONException {
+    /*
+      There is now a simpler implementation using toMap() or entrySet()
+      https://stackoverflow.com/a/64340427/4040267
+      But alas, it looks like the android version does not support these new functions yet
+      Sticking to our hard-coded solution
+     */
+    JSONArray toBeCopiedKeys = autogen.names();
+    for(int j = 0; j < toBeCopiedKeys.length(); j++) {
+      String currKey = toBeCopiedKeys.getString(j);
+      existing.put(currKey, autogen.get(currKey));
+    }
+
+  }
+
+
+  private static void fillWithDefaults(Context ctxt, JSONObject notifyConfig, String field, JSONObject defaultValue) throws JSONException {
+	  JSONObject currField = notifyConfig.optJSONObject(field);
+	  if (currField == null) {
+	    Log.d(ctxt, TAG, "Did not find existing field "+currField+" filling in default");
+	    notifyConfig.put(field, defaultValue);
+    } else {
+      Log.d(ctxt, TAG, "Found existing field "+currField+" retaining existing");
+    }
+  }
 }
