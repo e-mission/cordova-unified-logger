@@ -11,10 +11,11 @@
 @interface LocalNotificationManager : NSObject
 
 +(void)clearNotifications;
++(void)cancelNotification:(NSNumber*) id;
 +(void)addNotification:(NSString*) notificationMessage;
 +(void)addNotification:(NSString*) notificationMessage showUI:(BOOL)showUI;
 +(void)showNotification:(NSString*) notificationMessage;
 +(void)showNotificationAfterSecs:(NSString *)notificationMessage withUserInfo:(NSDictionary*)userInfo
                                                                     secsLater:(int)secsLater;
-
++(void)schedulePluginCompatibleNotification:(NSDictionary*) currNotifyConfig withNewData:(NSDictionary*)newData;
 @end
