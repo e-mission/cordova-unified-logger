@@ -9,6 +9,7 @@
 #import "LocalNotificationManager.h"
 #import "ConfigManager.h"
 #import "DBLogging.h"
+#import <Cordova/CDV.h>
 #import <UIKit/UIKit.h>
 
 @implementation LocalNotificationManager
@@ -67,6 +68,60 @@ static int notificationCount = 0;
         }
         localNotif.fireDate = [NSDate dateWithTimeIntervalSinceNow:secsLater];
         [[UIApplication sharedApplication] scheduleLocalNotification:localNotif];
+    }
+}
+
++(void)cancelNotification:(NSNumber*)id
+{
+    CDVAppDelegate *ad = [[UIApplication sharedApplication] delegate];
+    CDVViewController *vc = ad.viewController;
+    CDVInvokedUrlCommand* command = [[CDVInvokedUrlCommand new] initWithArguments:@[id] callbackId:@"FROM_NATIVE_CODE" className:@"LocalNotification" methodName:@"cancel"];
+    [vc.commandQueue execute:command];
+}
+
++(void)schedulePluginCompatibleNotification:(NSDictionary*) currNotifyConfig withNewData:(NSDictionary*)newData
+{
+    NSMutableDictionary* modifiedConfig = [NSMutableDictionary dictionaryWithDictionary:currNotifyConfig];
+    [self fillWithDefaults:modifiedConfig key:@"data" defaultVal:@{}];
+
+    NSDictionary* defaultTrigger = @{
+        @"type": @"calendar"
+    };
+    NSDictionary* defaultProgressBar = @{
+        @"enabled": @false
+    };
+    [self fillWithDefaults:modifiedConfig key:@"trigger" defaultVal:defaultTrigger];
+    [self fillWithDefaults:modifiedConfig key:@"progressBar" defaultVal:defaultProgressBar];
+
+    NSMutableDictionary* modifiedCurrData = [NSMutableDictionary dictionaryWithDictionary:modifiedConfig[@"data"]];
+    if (newData != NULL) {
+        [self mergeObjects:modifiedCurrData toAutoGen:newData];
+        modifiedConfig[@"data"] = modifiedCurrData;
+    }
+    // Unlike android, the schedule method in the plugin is
+    // private and there is no Manager class that we can work
+    // with directly.
+    // Let's see if we can call the public method
+    // although I am not optimistic
+    CDVAppDelegate *ad = [[UIApplication sharedApplication] delegate];
+    CDVViewController *vc = ad.viewController;
+    CDVInvokedUrlCommand* command = [[CDVInvokedUrlCommand new] initWithArguments:@[modifiedConfig] callbackId:@"FROM_NATIVE_CODE" className:@"LocalNotification" methodName:@"schedule"];
+    [vc.commandQueue execute:command];
+}
+
++(void)mergeObjects:(NSMutableDictionary*) existing toAutoGen:(NSDictionary*)autogen {
+    [existing addEntriesFromDictionary:autogen];
+}
+
++(void) fillWithDefaults:(NSMutableDictionary*)notifyConfig
+                     key:(NSString*) field defaultVal:(NSDictionary*)defaultValue
+{
+    NSObject* currField = notifyConfig[field];
+    if (currField == NULL) {
+        [[DBLogging database] log:[NSString stringWithFormat:@"Did not find existing field %@, filling in default %@", currField, defaultValue] atLevel:@"DEBUG"];
+        notifyConfig[field] = defaultValue;
+    } else {
+        [[DBLogging database] log:[NSString stringWithFormat:@"Found existing field %@, retaining existing", currField] atLevel:@"DEBUG"];
     }
 }
 
