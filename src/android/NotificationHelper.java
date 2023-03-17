@@ -51,7 +51,7 @@ public class NotificationHelper {
 		activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
 		PendingIntent activityPendingIntent = PendingIntent.getActivity(context, 0,
-				activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+				activityIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 		builder.setContentIntent(activityPendingIntent);		
 		
 		Log.d(context, TAG, "Generating notify with id " + id + " and message " + message);
@@ -85,7 +85,7 @@ public class NotificationHelper {
 		activityIntent.putExtra(NotificationHelper.RESOLUTION_PENDING_INTENT_KEY, intent);
 
 		PendingIntent activityPendingIntent = PendingIntent.getActivity(context, 0,
-				activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+				activityIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 		builder.setContentIntent(activityPendingIntent);
 		// builder.setAutoCancel(true);
 
